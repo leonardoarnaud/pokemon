@@ -17,9 +17,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable true
+            buildConfigField ("String", 'BASE_URL', '"https://pokeapi.co/api/v2/"')
+            buildConfigField ("String", 'DEFAULT_PHOTO_URL', '"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%s.png"')
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField ("String", 'BASE_URL', '"https://pokeapi.co/api/v2/"')
+            buildConfigField ("String", 'DEFAULT_PHOTO_URL', '"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/%s.png"')
         }
     }
     compileOptions {
@@ -44,6 +51,14 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.7.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.14.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
+    implementation "androidx.room:room-runtime:2.2.5"
+    annotationProcessor "androidx.room:room-compiler:2.2.5"
+    implementation "androidx.room:room-ktx:2.2.5"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

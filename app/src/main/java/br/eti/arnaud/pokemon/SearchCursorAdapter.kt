@@ -16,7 +16,7 @@ class SearchCursorAdapter(
     CursorAdapter(context, c, autoRequery) {
 
     override fun newView(context: Context?, cursor: Cursor?, parent: ViewGroup?): View {
-        return layoutInflater.inflate(R.layout.item_search_suggestion, parent, false)
+        return layoutInflater.inflate(R.layout.item_pokemon, parent, false)
     }
 
     override fun bindView(view: View?, context: Context?, cursor: Cursor?) {
