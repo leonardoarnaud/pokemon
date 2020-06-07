@@ -1,5 +1,6 @@
 package br.eti.arnaud.pokemon.repository
 
+import android.annotation.SuppressLint
 import android.os.AsyncTask
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -12,44 +13,64 @@ import kotlinx.coroutines.launch
 
 class Pokemons {
 
-    val obs = Observables()
+    val obs = PublicObservables()
 
-    private var currentQuery: String = ""
+    private var _currentQuery: String = ""
 
     private val _remotePokemons = MutableLiveData<AllPokemonsReponse>()
-    private val remoteObserver = Observer<AllPokemonsReponse> {
+    private val _remotePokemonsObserver = Observer<AllPokemonsReponse> {
         it?.let {
             AsyncTask.execute {
-                savePokemons(it)
-                load(currentQuery)
+                save(it)
+                loadFromDb()
+                obs.loading.postValue(false)
             }
         }
     }
 
-    init {
-        _remotePokemons.observeForever(remoteObserver)
+    fun start() {
+        _remotePokemons.observeForever(_remotePokemonsObserver)
     }
 
-    fun load(query: String) {
-        currentQuery = query
+    private fun loadFromDb() {
         AsyncTask.execute {
-            val id = query.toLongOrNull()
+            val id = _currentQuery.toLongOrNull()
             App.instance.db.pokemonDao().let {
-                obs.pokemonList.postValue(
-                    if (id != null) it.load(id)
-                    else it.load("'%$query%'")
+                obs.pokemonsList.postValue(
+                    capitalizeNames(
+                        when {
+                            id != null -> it.load(id)
+                            _currentQuery.isEmpty() -> it.loadAll()
+                            else -> it.load("%$_currentQuery%")
+                        }
+                    )
                 )
             }
         }
     }
 
+    @SuppressLint("DefaultLocale")
+    private fun capitalizeNames(pokemons: List<Pokemon>): List<Pokemon> {
+        return pokemons.mapTo(arrayListOf()) {
+            Pokemon(
+                id = it.id,
+                name = it.name.capitalize(),
+                image = it.image
+            )
+        }
+    }
+
     fun updatePokemons() {
+        obs.loading.postValue(true)
         GlobalScope.launch {
+            if (obs.pokemonsList.value == null) {
+                search(_currentQuery)
+            }
             _remotePokemons.postValue(App.instance.client.allPokemons())
         }
     }
 
-    private fun savePokemons(allPokemonsResponse: AllPokemonsReponse) {
+    private fun save(allPokemonsResponse: AllPokemonsReponse) {
         App.instance.db.pokemonDao().insert(
             allPokemonsResponse.results.mapTo(arrayListOf(), { result ->
                 (allPokemonsResponse.results.indexOf(result) + 1).toLong().let { id ->
@@ -63,11 +84,17 @@ class Pokemons {
         )
     }
 
-    fun clear() {
-        _remotePokemons.removeObserver(remoteObserver)
+    fun search(query: String) {
+        _currentQuery = query
+        loadFromDb()
     }
 
-    class Observables {
-        val pokemonList = MutableLiveData<List<Pokemon>>()
+    fun release() {
+        _remotePokemons.removeObserver(_remotePokemonsObserver)
+    }
+
+    class PublicObservables {
+        val pokemonsList = MutableLiveData<List<Pokemon>>()
+        val loading = MutableLiveData<Boolean>()
     }
 }

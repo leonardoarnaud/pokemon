@@ -7,7 +7,7 @@ import br.eti.arnaud.pokemon.ui.main.MainFragment
 
 class MainActivity : SearchActivity() {
 
-    private lateinit var vm: MainViewModel
+    override lateinit var vm: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -15,6 +15,7 @@ class MainActivity : SearchActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         vm = ViewModelProvider(this)[MainViewModel::class.java]
+        vm.start()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -22,17 +23,20 @@ class MainActivity : SearchActivity() {
                 .commitNow()
         }
 
-        vm.pokemons.load("")
         vm.pokemons.updatePokemons()
     }
 
     override fun onSearchTextSubmit(query: String) {
-        vm.pokemons.load(query)
+        vm.pokemons.search(query)
     }
 
     override fun onSearchTextChange(query: String) {
-        vm.pokemons.load(query)
+        vm.pokemons.search(query)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
 
+        vm.release()
+    }
 }
