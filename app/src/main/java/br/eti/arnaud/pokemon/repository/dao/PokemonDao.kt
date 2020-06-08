@@ -9,13 +9,13 @@ import br.eti.arnaud.pokemon.repository.entity.Pokemon
 @Dao
 interface PokemonDao {
 
-    @Query("SELECT * FROM Pokemon WHERE name LIKE :name")
+    @Query("SELECT * FROM Pokemon WHERE name LIKE :name ORDER BY name ASC")
     fun load(name: String): List<Pokemon>
 
-    @Query("SELECT * FROM Pokemon WHERE id = :id")
+    @Query("SELECT * FROM Pokemon WHERE id = :id ORDER BY name ASC")
     fun load(id: Long): List<Pokemon>
 
-    @Query("SELECT * FROM Pokemon")
+    @Query("SELECT * FROM Pokemon ORDER BY name ASC")
     fun loadAll(): List<Pokemon>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

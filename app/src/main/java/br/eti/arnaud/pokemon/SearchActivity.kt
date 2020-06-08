@@ -24,9 +24,10 @@ abstract class SearchActivity : BaseActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_activity_main, menu)
         searchView = (menu?.findItem(R.id.action_search)?.actionView as SearchView)
-        searchView.setQuery(currentQuery, currentQuery.isNotEmpty())
         searchView.apply {
             maxWidth = Integer.MAX_VALUE
+            setQuery(currentQuery, currentQuery.isNotEmpty())
+            queryHint = getString(R.string.search_activity_query_hint)
             setOnQueryTextListener({
                 onSearchTextSubmit(it)
                 hideKeyboard(searchView)

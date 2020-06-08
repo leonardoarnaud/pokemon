@@ -3,4 +3,5 @@
     <string name="title_activity_main">Pokemon</string>
     <string name="search_menu_title_menu_activity_main">Busca</string>
     <string name="main_fragment_empty_message">Ainda não encontramos pokemons...</string>
+    <string name="search_activity_query_hint">Digite o nome ou ID</string>
 </resources>
